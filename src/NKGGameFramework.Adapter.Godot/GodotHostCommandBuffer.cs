@@ -23,14 +23,16 @@ public sealed class GodotHostCommandBuffer
 
     private readonly MemoryStream _binaryStream;
     private readonly BinaryWriter _binaryWriter;
-    private readonly StringBuilder _textBuilder;
+    private readonly StringBuilder? _textBuilder;
+    private readonly bool _captureText;
     private bool _ended;
 
-    public GodotHostCommandBuffer(int capacity = 1024)
+    public GodotHostCommandBuffer(int capacity = 1024, bool captureText = true)
     {
         _binaryStream = new MemoryStream(capacity);
         _binaryWriter = new BinaryWriter(_binaryStream, Encoding.UTF8, leaveOpen: true);
-        _textBuilder = new StringBuilder(capacity);
+        _captureText = captureText;
+        _textBuilder = captureText ? new StringBuilder(capacity) : null;
     }
 
     public void BeginFrame(int frame, int score, int lives, bool isTerminal)
@@ -42,9 +44,12 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(lives);
         _binaryWriter.Write((byte)(isTerminal ? 1 : 0));
 
-        _textBuilder.Append(
-            CultureInfo.InvariantCulture,
-            $"FRAME {frame} {score} {lives} {(isTerminal ? 1 : 0)}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(
+                CultureInfo.InvariantCulture,
+                $"FRAME {frame} {score} {lives} {(isTerminal ? 1 : 0)}\n");
+        }
     }
 
     public void UpsertNode2D(string kind, long id, double x, double y)
@@ -61,9 +66,12 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(x);
         _binaryWriter.Write(y);
 
-        _textBuilder.Append(
-            CultureInfo.InvariantCulture,
-            $"NODE2D {kind} {id} {x:0.###} {y:0.###}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(
+                CultureInfo.InvariantCulture,
+                $"NODE2D {kind} {id} {x:0.###} {y:0.###}\n");
+        }
     }
 
     public void CreateNode(int id, string typeName, string name)
@@ -77,9 +85,12 @@ public sealed class GodotHostCommandBuffer
         WriteBinaryString(typeName);
         WriteBinaryString(name);
 
-        _textBuilder.Append(
-            CultureInfo.InvariantCulture,
-            $"CREATE_NODE {id} {typeName} {name}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(
+                CultureInfo.InvariantCulture,
+                $"CREATE_NODE {id} {typeName} {name}\n");
+        }
     }
 
     public void DestroyObject(int id)
@@ -88,9 +99,12 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(DestroyObjectCommand);
         _binaryWriter.Write(id);
 
-        _textBuilder.Append(
-            CultureInfo.InvariantCulture,
-            $"DESTROY_OBJECT {id}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(
+                CultureInfo.InvariantCulture,
+                $"DESTROY_OBJECT {id}\n");
+        }
     }
 
     public void SetParent(int childId, int parentId)
@@ -100,9 +114,12 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(childId);
         _binaryWriter.Write(parentId);
 
-        _textBuilder.Append(
-            CultureInfo.InvariantCulture,
-            $"SET_PARENT {childId} {parentId}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(
+                CultureInfo.InvariantCulture,
+                $"SET_PARENT {childId} {parentId}\n");
+        }
     }
 
     public void SetTransform2D(int id, double x, double y, double rotation, double scaleX, double scaleY)
@@ -116,9 +133,12 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(scaleX);
         _binaryWriter.Write(scaleY);
 
-        _textBuilder.Append(
-            CultureInfo.InvariantCulture,
-            $"SET_TRANSFORM2D {id} {x:0.###} {y:0.###} {rotation:0.###} {scaleX:0.###} {scaleY:0.###}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(
+                CultureInfo.InvariantCulture,
+                $"SET_TRANSFORM2D {id} {x:0.###} {y:0.###} {rotation:0.###} {scaleX:0.###} {scaleY:0.###}\n");
+        }
     }
 
     public void SetVisible(int id, bool visible)
@@ -128,9 +148,12 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(id);
         _binaryWriter.Write((byte)(visible ? 1 : 0));
 
-        _textBuilder.Append(
-            CultureInfo.InvariantCulture,
-            $"SET_VISIBLE {id} {(visible ? 1 : 0)}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(
+                CultureInfo.InvariantCulture,
+                $"SET_VISIBLE {id} {(visible ? 1 : 0)}\n");
+        }
     }
 
     public void SetProperty(int id, string propertyName, GodotVariant value)
@@ -143,9 +166,12 @@ public sealed class GodotHostCommandBuffer
         WriteBinaryString(propertyName);
         WriteVariant(value);
 
-        _textBuilder.Append(
-            CultureInfo.InvariantCulture,
-            $"SET_PROPERTY {id} {propertyName} {FormatVariant(value)}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(
+                CultureInfo.InvariantCulture,
+                $"SET_PROPERTY {id} {propertyName} {FormatVariant(value)}\n");
+        }
     }
 
     public void CallMethod(int id, string methodName, IReadOnlyList<GodotVariant> arguments)
@@ -163,13 +189,16 @@ public sealed class GodotHostCommandBuffer
             WriteVariant(argument);
         }
 
-        _textBuilder.Append(CultureInfo.InvariantCulture, $"CALL_METHOD {id} {methodName} {arguments.Count}");
-        foreach (var argument in arguments)
+        if (_captureText)
         {
-            _textBuilder.Append(' ');
-            _textBuilder.Append(FormatVariant(argument));
+            _textBuilder!.Append(CultureInfo.InvariantCulture, $"CALL_METHOD {id} {methodName} {arguments.Count}");
+            foreach (var argument in arguments)
+            {
+                _textBuilder.Append(' ');
+                _textBuilder.Append(FormatVariant(argument));
+            }
+            _textBuilder.Append('\n');
         }
-        _textBuilder.Append('\n');
     }
 
     public void LoadResource(GodotResourceId id, string path)
@@ -181,7 +210,10 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(id.Value);
         WriteBinaryString(path);
 
-        _textBuilder.Append(CultureInfo.InvariantCulture, $"LOAD_RESOURCE {id.Value} {path}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(CultureInfo.InvariantCulture, $"LOAD_RESOURCE {id.Value} {path}\n");
+        }
     }
 
     public void ReleaseResource(GodotResourceId id)
@@ -191,7 +223,10 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(ReleaseResourceCommand);
         _binaryWriter.Write(id.Value);
 
-        _textBuilder.Append(CultureInfo.InvariantCulture, $"RELEASE_RESOURCE {id.Value}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(CultureInfo.InvariantCulture, $"RELEASE_RESOURCE {id.Value}\n");
+        }
     }
 
     public void InstantiateScene(int id, GodotResourceId resourceId, string name)
@@ -204,7 +239,10 @@ public sealed class GodotHostCommandBuffer
         _binaryWriter.Write(resourceId.Value);
         WriteBinaryString(name);
 
-        _textBuilder.Append(CultureInfo.InvariantCulture, $"INSTANTIATE_SCENE {id} {resourceId.Value} {name}\n");
+        if (_captureText)
+        {
+            _textBuilder!.Append(CultureInfo.InvariantCulture, $"INSTANTIATE_SCENE {id} {resourceId.Value} {name}\n");
+        }
     }
 
     public string Build()
@@ -221,8 +259,13 @@ public sealed class GodotHostCommandBuffer
 
     public string BuildText()
     {
+        if (!_captureText)
+        {
+            throw new InvalidOperationException("This Godot host command buffer was created without text capture.");
+        }
+
         EnsureEnded();
-        return _textBuilder.ToString();
+        return _textBuilder!.ToString();
     }
 
     private void EnsureEnded()
@@ -230,7 +273,10 @@ public sealed class GodotHostCommandBuffer
         if (!_ended)
         {
             _binaryWriter.Write(EndCommand);
-            _textBuilder.Append("END");
+            if (_captureText)
+            {
+                _textBuilder!.Append("END");
+            }
             _ended = true;
         }
     }
