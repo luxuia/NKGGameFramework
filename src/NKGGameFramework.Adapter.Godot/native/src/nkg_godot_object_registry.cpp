@@ -1,5 +1,7 @@
 #include "nkg_godot_object_registry.h"
 
+#include <godot_cpp/core/memory.hpp>
+
 #include <vector>
 
 namespace godot
@@ -43,7 +45,11 @@ Node2D* NkgGodotObjectRegistry::sync_node2d(const std::string& p_key, const Node
             Node2D* node = Object::cast_to<Node2D>(p_object);
             if (node != nullptr)
             {
-                node->queue_free();
+                if (node->get_parent() != nullptr)
+                {
+                    node->get_parent()->remove_child(node);
+                }
+                memdelete(node);
             }
         },
         true);
@@ -99,6 +105,23 @@ void NkgGodotObjectRegistry::remove_stale_objects()
 
         release_object(key);
     }
+}
+
+void NkgGodotObjectRegistry::clear()
+{
+    std::vector<std::string> keys;
+    keys.reserve(entries.size());
+    for (const auto& item : entries)
+    {
+        keys.push_back(item.first);
+    }
+
+    for (const auto& key : keys)
+    {
+        release_object(key);
+    }
+
+    entries.clear();
 }
 
 size_t NkgGodotObjectRegistry::size() const

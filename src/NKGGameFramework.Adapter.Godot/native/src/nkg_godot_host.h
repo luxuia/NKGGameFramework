@@ -31,6 +31,7 @@ public:
     ~NkgGodotHost();
 
     void set_root(Node* p_root);
+    void clear();
     bool start_debug_transport(uint16_t p_port);
     void stop_debug_transport();
     bool is_debug_transport_running() const;

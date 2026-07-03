@@ -29,6 +29,7 @@ public:
     Object* get_object(const std::string& p_key) const;
     bool release_object(const std::string& p_key);
     void remove_stale_objects();
+    void clear();
     size_t size() const;
     int32_t frame() const;
 

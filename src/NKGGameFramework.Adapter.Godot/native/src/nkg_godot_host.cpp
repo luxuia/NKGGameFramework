@@ -1,5 +1,8 @@
 #include "nkg_godot_host.h"
 
+#include <godot_cpp/classes/audio_stream.hpp>
+#include <godot_cpp/classes/audio_stream_playback.hpp>
+#include <godot_cpp/classes/audio_stream_player.hpp>
 #include <godot_cpp/classes/canvas_item.hpp>
 #include <godot_cpp/classes/class_db_singleton.hpp>
 #include <godot_cpp/classes/control.hpp>
@@ -19,12 +22,20 @@ namespace godot
 
 NkgGodotHost::~NkgGodotHost()
 {
-    stop_debug_transport();
+    clear();
 }
 
 void NkgGodotHost::set_root(Node* p_root)
 {
     root = p_root;
+}
+
+void NkgGodotHost::clear()
+{
+    stop_debug_transport();
+    objects.clear();
+    resources.clear();
+    root = nullptr;
 }
 
 bool NkgGodotHost::start_debug_transport(uint16_t p_port)
@@ -427,10 +438,32 @@ Object* NkgGodotHost::create_object_by_type(const std::string& p_type_name) cons
 
 void NkgGodotHost::release_object(Object* p_object) const
 {
+    AudioStreamPlayer* audio_player = Object::cast_to<AudioStreamPlayer>(p_object);
+    if (audio_player != nullptr)
+    {
+        audio_player->set_stream_paused(true);
+        audio_player->set_playing(false);
+        audio_player->stop();
+        if (audio_player->has_stream_playback())
+        {
+            Ref<AudioStreamPlayback> playback = audio_player->get_stream_playback();
+            if (playback.is_valid())
+            {
+                playback->stop();
+                playback.unref();
+            }
+        }
+        audio_player->set_stream(Ref<AudioStream>());
+    }
+
     Node* node = Object::cast_to<Node>(p_object);
     if (node != nullptr)
     {
-        node->queue_free();
+        if (node->get_parent() != nullptr)
+        {
+            node->get_parent()->remove_child(node);
+        }
+        memdelete(node);
         return;
     }
 
