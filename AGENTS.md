@@ -82,3 +82,5 @@ Recent commits use concise Chinese imperative summaries, such as `补齐 Hosting
 ## Agent-Specific Instructions
 
 Preserve untracked user work. Prefer targeted edits, match existing patterns, and avoid adding dependencies unless already used or explicitly approved.
+
+游戏开发相关任务优先阅读跨工具 agent 文档 `agents/nkg-game-development-agent.md`。更详细的指南见 `docs/ai-game-development-agent.md`；可选的 Codex 风格 skill 见 `.codex/skills/nkg-game-development/SKILL.md`。这些文档记录了本框架在 runtime loop、Procedure/ECS 分工、GameplayTag/Skill/Buff/BehaviorTree、adapter 边界、debug capture 和验证命令上的约定。

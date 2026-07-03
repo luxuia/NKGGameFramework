@@ -1,0 +1,4 @@
+interface:
+  display_name: "NKG 游戏开发"
+  short_description: "指导 AI agent 使用 NKGGameFramework 开发游戏"
+  default_prompt: "使用 $nkg-game-development 在 NKGGameFramework 中实现一个玩法功能。"

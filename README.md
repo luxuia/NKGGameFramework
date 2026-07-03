@@ -20,6 +20,17 @@ NKGGameFramework 是一个不依赖具体游戏引擎的 C# 游戏框架底层�
 - `Sampler`：完整演示从启动、加载、玩法、存档到退出的流程。
 - `SkillSystemSampler`：专门演示 Skill/Buff/BehaviorTree 的组合运行。
 
+## AI 辅助开发入口
+
+如果你让 Codex、Claude Code、Cursor 或其他 AI agent 基于本框架开发游戏功能，建议先让它阅读项目内的 agent 文档：
+
+- `agents/nkg-game-development-agent.md`：跨工具的主 agent 文档，适合直接作为 Codex、Claude Code、Cursor 或其他 AI 的项目角色/规则入口。
+- `docs/ai-game-development-agent.md`：普通 agent 或人工协作者可直接阅读的游戏开发指南。
+- `.codex/skills/nkg-game-development/SKILL.md`：Codex 风格项目 skill，可作为支持 skill 的工具的可选入口。
+- `.codex/skills/nkg-game-development/references/framework-patterns.md`：更详细的框架模式参考，覆盖 Runtime、ECS、GameplayTag、Skill/Buff/BehaviorTree、Adapter 边界和 Debug/Dump。
+
+推荐在需求里明确写上“使用 `agents/nkg-game-development-agent.md` 作为项目 agent 规则”，这样 AI 更容易保持主包引擎无关、正确使用 `RuntimeContext.Update`、ECS CommandBuffer、Gameplay 扩展点和相关验证命令。
+
 ## 项目结构
 
 ```mermaid
