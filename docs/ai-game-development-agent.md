@@ -122,7 +122,7 @@ Gameplay 负责引擎无关的标签、技能、Buff 和行为树。
 - 技能学习和释放走 `SkillManager.Learn` / `SkillManager.TryCast`。不要绕开 CD、消耗、标签 gate、效果校验和释放事件。
 - Buff 添加和生命周期走 `BuffManager.Apply/TryApply`、`BuffUpdateSystem`、`BuffEffectRegistry`。
 - 有时序、延迟、取消、等待、黑板条件、连段或循环动作的能力使用 `BehaviorTreeDefinition`。
-- 动画、特效、音频、材质、碰撞体、host command 等引擎行为通过 `BehaviorActionRegistry`、`SkillEffectRegistry`、`BuffEffectRegistry` 注册，不进入主包。
+- 动画、特效、音频、材质、碰撞体、表现对象更新等引擎行为通过 `BehaviorActionRegistry`、`SkillEffectRegistry`、`BuffEffectRegistry` 或 adapter/host 边界注册，不进入主包。
 - 行为树 action 执行可能触发结构变化，所以系统应先收集实例、退出 ECS query，再更新行为树。
 
 推荐系统顺序：
@@ -188,7 +188,7 @@ Mutation 默认关闭，本地开发需要显式启用。Dump 录制应保留 EC
 Adapter/host 的职责是把框架数据翻译成引擎对象：
 
 - Godot/Unity 对象、节点、资源、输入、渲染、音频、UI 不进入主包。
-- Godot host command 模式应从 ECS 状态生成创建、更新、销毁命令，用 ID 维持可见对象生命周期。
+- Godot/Unity 表现同步应由宿主或业务 adapter 持有真实引擎对象；属性变化优先直接写入对应对象，不在框架层维护批处理同步流程。
 - sample 可以演示真实玩法和桥接，但 core/sample 的局内状态仍应是 entity、component、scene component、score、life、command buffer 等框架数据。
 
 ## 测试和验证

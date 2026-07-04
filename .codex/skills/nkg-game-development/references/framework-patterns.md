@@ -12,10 +12,10 @@
 - `NKGGameFramework.Diagnostics`：snapshot、mutation、dump、playback、analysis；依赖主包。
 - `NKGGameFramework.Hosting`：本地 loopback HTTP/SSE debug transport；依赖 Diagnostics 和主包。
 - `NKGGameFramework.Hosting.Web`：只承载 React/Vite 调试面板。
-- `Adapter.Unity` / `Adapter.Godot`：引擎边界契约和 host command；主包不反向依赖 adapter。
+- `Adapter.Unity` / `Adapter.Godot`：引擎边界契约；主包不反向依赖 adapter。
 - `samples`：可执行用法和集成示例。
 
-当需求同时包含玩法和表现时，必须拆分：纯状态/规则放在 core 或 sample gameplay 层；引擎对象创建、特效、音频、UI、资源和 host command 放在 adapter/host 边界。
+当需求同时包含玩法和表现时，必须拆分：纯状态/规则放在 core 或 sample gameplay 层；引擎对象创建、特效、音频、UI、资源和表现对象更新放在 adapter/host 边界。
 
 ## Runtime Loop
 
@@ -136,7 +136,7 @@ scene.Systems.Add(new BehaviorTreeUpdateSystem(order: 10));
 scene.Systems.Add(new BuffUpdateSystem(buffEffects, buffActions, order: 20));
 ```
 
-引擎动作通过 registries 注册。动画、特效、音效、材质修改、碰撞体变化、Timeline 和 host command 属于 adapter/business registration，不进入 core。
+引擎动作通过 registries 注册。动画、特效、音效、材质修改、碰撞体变化、Timeline 和表现对象更新属于 adapter/business registration，不进入 core。
 
 ## 池化和热路径
 
@@ -211,13 +211,12 @@ Nodes 是跨平台图数据和规则：
 
 ## Adapter 和 Samples
 
-Godot/Unity adapter 把框架数据翻译成引擎概念。Godot host command flow 使用稳定 ID 和 command buffer 从 ECS 状态创建、更新、销毁节点。Entity/component/gameplay state 保持在 managed framework data 中。
+Godot/Unity adapter 把框架数据翻译成引擎概念。表现层应由宿主或业务 adapter 持有真实引擎对象，并在属性变化时直接写入对应对象。Entity/component/gameplay state 保持在 managed framework data 中。
 
 Samples：
 
 - `NKGGameFramework.Sampler`：Runtime、Procedure、ECS、serialization。
 - `NKGGameFramework.SkillSystemSampler`：GameplayTag、Skill、Buff、BehaviorTree。
-- `NKGGameFramework.GodotPlaneSample` 和 `GodotPlaneSample`：Godot/LeanCLR 宿主集成。
 
 ## 测试
 

@@ -38,7 +38,7 @@ description: 指导 AI agent 使用 NKGGameFramework 开发游戏和玩法功能
 - Snapshot、mutation、dump、回放、分析：`src/NKGGameFramework.Diagnostics`
 - 本地 loopback HTTP/SSE Debug Host：`src/NKGGameFramework.Hosting`
 - React 调试面板：`src/NKGGameFramework.Hosting.Web`
-- Unity/Godot 边界和 host command：`src/NKGGameFramework.Adapter.Unity`、`src/NKGGameFramework.Adapter.Godot`
+- Unity/Godot 边界契约：`src/NKGGameFramework.Adapter.Unity`、`src/NKGGameFramework.Adapter.Godot`
 - 可运行示例和引擎宿主演示：`samples`
 
 ## 实现流程
@@ -79,7 +79,7 @@ ECS 管局内模拟。使用 `World` / `Scene` 作为运行边界，`struct ICom
 - 主动技能流程使用 `SkillManager.Learn` 和 `SkillManager.TryCast`。除非测试证明需要新的扩展点，否则不要绕过 CD、消耗、tag gate、effect 校验或释放事件。
 - 定时状态和周期效果使用 `BuffManager.Apply/TryApply`、`BuffUpdateSystem`、`BuffEffectRegistry`。
 - 有时序、等待、取消、黑板条件、重复动作或延迟效果的技能/Buff 使用 `BehaviorTreeDefinition`。
-- 引擎相关行为通过 `BehaviorActionRegistry`、`SkillEffectRegistry`、`BuffEffectRegistry` 注册。动画、特效、音频、材质、host command 不进入 core gameplay 包。
+- 引擎相关行为通过 `BehaviorActionRegistry`、`SkillEffectRegistry`、`BuffEffectRegistry` 或 adapter/host 边界注册。动画、特效、音频、材质、表现对象更新不进入 core gameplay 包。
 - 行为树更新应先收集实例、退出 ECS query，再执行 action；避免在 query active 时执行可能触发结构变化的 action。
 
 ## Runtime、Async、Serialization
@@ -122,7 +122,7 @@ ECS 管局内模拟。使用 `World` / `Scene` 作为运行边界，`struct ICom
 ## Adapter 和宿主规则
 
 - Adapter 把框架数据翻译成引擎概念，不把引擎依赖反向推入 `src/NKGGameFramework`。
-- Godot host command 代码应基于 ID 和 command buffer 从 ECS 状态创建、更新、销毁引擎节点。
+- Godot/Unity 表现层应在宿主或业务 adapter 中封装真实引擎对象；属性变化优先直接写到对应引擎对象，不在框架层维护批处理同步流程。
 - Sample 可以演示真实集成，但核心局内状态仍应使用框架数据。
 
 ## 验证

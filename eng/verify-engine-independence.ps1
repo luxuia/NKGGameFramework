@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$pattern = "UnityEngine|UnityEditor|MonoBehaviour|GameObject|Transform|using\s+Godot|YooAsset|HybridCLR|Luban"
+$pattern = "UnityEngine|UnityEditor|MonoBehaviour|GameObject|UnityEngine\.Transform|using\s+Godot|YooAsset|HybridCLR|Luban"
 $paths = @(
     "src/NKGGameFramework",
     "tests"

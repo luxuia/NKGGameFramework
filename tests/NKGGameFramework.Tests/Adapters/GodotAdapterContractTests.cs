@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using NKGGameFramework.Adapter.Godot;
 using NKGGameFramework.Async;
 using NKGGameFramework.Core;
+using NKGGameFramework.Diagnostics;
 using NKGGameFramework.Runtime;
 
 namespace NKGGameFramework.Tests.Adapters;
@@ -44,6 +45,18 @@ public sealed class GodotAdapterContractTests
         Assert.IsAssignableFrom<ISceneService>(scenes);
         Assert.Equal("res://main.tscn", handle.Location);
         Assert.Equal(("res://main.tscn", SceneLoadMode.Additive), scenes.Loaded.Single());
+    }
+
+    [Fact]
+    public void GodotDebugEndpointBridgeUsesGodotRuntimeDefaults()
+    {
+        var options = GodotDebugEndpointBridge.CreateDispatcherOptions();
+
+        Assert.Equal("/_nkg/debug", options.EndpointPrefix);
+        Assert.False(options.DefaultWaitForSnapshotFrame);
+        Assert.True(options.EnableMutations);
+        Assert.Same(GameDebugController.Shared, options.Control);
+        Assert.Same(GameDebugFramePublisher.Shared, options.Frames);
     }
 
     private sealed class RecordingGodotDriver : IGodotGameLoopDriver
