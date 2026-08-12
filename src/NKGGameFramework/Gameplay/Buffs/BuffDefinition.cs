@@ -81,6 +81,7 @@ public sealed class BuffDefinition
     public List<string> EventKeys { get; init; } = [];
 
     public BehaviorTreeDefinition? ExecutionTree { get; init; }
+    public List<AttributeModifierSpec> AttributeModifiers { get; init; } = [];
 
     public double GetValue(int level, double fallback = 0)
     {

@@ -139,6 +139,24 @@ public abstract class QuerySystem<TFirst, TSecond> : EcsSystem
     protected abstract void OnUpdate(EntityQuery<TFirst, TSecond> query, in SystemUpdateContext context);
 }
 
+public abstract class QuerySystem<TFirst, TSecond, TThird> : EcsSystem
+    where TFirst : struct, IComponent
+    where TSecond : struct, IComponent
+    where TThird : struct, IComponent
+{
+    protected QuerySystem(int order = 0)
+        : base(order)
+    {
+    }
+
+    public sealed override void Update(Scene scene, in SystemUpdateContext context)
+    {
+        OnUpdate(scene.Query<TFirst, TSecond, TThird>(), in context);
+    }
+
+    protected abstract void OnUpdate(EntityQuery<TFirst, TSecond, TThird> query, in SystemUpdateContext context);
+}
+
 public sealed class SystemGroup : IDisposable
 {
     private readonly List<ISystem> _systems = [];

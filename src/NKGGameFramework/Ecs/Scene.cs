@@ -149,6 +149,60 @@ public sealed class Scene : IDisposable
         return new EntityQuery<TFirst, TSecond>(this);
     }
 
+    public EntityQuery<TFirst, TSecond, TThird> Query<TFirst, TSecond, TThird>()
+        where TFirst : struct, IComponent
+        where TSecond : struct, IComponent
+        where TThird : struct, IComponent
+    {
+        return new EntityQuery<TFirst, TSecond, TThird>(this);
+    }
+
+    public EntityAspect<TFirst, TSecond> GetAspect<TFirst, TSecond>(Entity entity)
+        where TFirst : struct, IComponent
+        where TSecond : struct, IComponent
+    {
+        EnsureEntity(entity);
+        return new EntityAspect<TFirst, TSecond>(this, entity);
+    }
+
+    public bool TryGetAspect<TFirst, TSecond>(Entity entity, out EntityAspect<TFirst, TSecond> aspect)
+        where TFirst : struct, IComponent
+        where TSecond : struct, IComponent
+    {
+        if (!HasComponent<TFirst>(entity) || !HasComponent<TSecond>(entity))
+        {
+            aspect = default;
+            return false;
+        }
+
+        aspect = new EntityAspect<TFirst, TSecond>(this, entity);
+        return true;
+    }
+
+    public EntityAspect<TFirst, TSecond, TThird> GetAspect<TFirst, TSecond, TThird>(Entity entity)
+        where TFirst : struct, IComponent
+        where TSecond : struct, IComponent
+        where TThird : struct, IComponent
+    {
+        EnsureEntity(entity);
+        return new EntityAspect<TFirst, TSecond, TThird>(this, entity);
+    }
+
+    public bool TryGetAspect<TFirst, TSecond, TThird>(Entity entity, out EntityAspect<TFirst, TSecond, TThird> aspect)
+        where TFirst : struct, IComponent
+        where TSecond : struct, IComponent
+        where TThird : struct, IComponent
+    {
+        if (!HasComponent<TFirst>(entity) || !HasComponent<TSecond>(entity) || !HasComponent<TThird>(entity))
+        {
+            aspect = default;
+            return false;
+        }
+
+        aspect = new EntityAspect<TFirst, TSecond, TThird>(this, entity);
+        return true;
+    }
+
     public EcsCommandBuffer CreateCommandBuffer()
     {
         var commandBuffer = _commandBuffers.Acquire();

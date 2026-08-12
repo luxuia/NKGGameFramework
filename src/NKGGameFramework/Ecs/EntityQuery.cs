@@ -7,6 +7,11 @@ public delegate void ForEachEntity<TFirst, TSecond>(ref TFirst first, ref TSecon
     where TFirst : struct, IComponent
     where TSecond : struct, IComponent;
 
+public delegate void ForEachEntity<TFirst, TSecond, TThird>(ref TFirst first, ref TSecond second, ref TThird third, Entity entity)
+    where TFirst : struct, IComponent
+    where TSecond : struct, IComponent
+    where TThird : struct, IComponent;
+
 public readonly struct EntityQuery<TComponent>
     where TComponent : struct, IComponent
 {
@@ -85,6 +90,66 @@ public readonly struct EntityQuery<TFirst, TSecond>
                 ref var first = ref firstStore.Get(id);
                 ref var second = ref secondStore.Get(id);
                 action(ref first, ref second, entity);
+            }
+        }
+        finally
+        {
+            _scene.ExitQuery();
+        }
+    }
+}
+
+public readonly struct EntityQuery<TFirst, TSecond, TThird>
+    where TFirst : struct, IComponent
+    where TSecond : struct, IComponent
+    where TThird : struct, IComponent
+{
+    private readonly Scene _scene;
+
+    internal EntityQuery(Scene scene)
+    {
+        _scene = scene;
+    }
+
+    public void ForEach(ForEachEntity<TFirst, TSecond, TThird> action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        if (!_scene.TryGetStore<TFirst>(out var firstStore)
+            || !_scene.TryGetStore<TSecond>(out var secondStore)
+            || !_scene.TryGetStore<TThird>(out var thirdStore))
+        {
+            return;
+        }
+
+        var primaryIds = firstStore.EntityIds;
+        var primaryCount = firstStore.Count;
+        if (secondStore.Count < primaryCount)
+        {
+            primaryIds = secondStore.EntityIds;
+            primaryCount = secondStore.Count;
+        }
+
+        if (thirdStore.Count < primaryCount)
+        {
+            primaryIds = thirdStore.EntityIds;
+        }
+
+        _scene.EnterQuery();
+        try
+        {
+            for (var i = 0; i < primaryIds.Count; i++)
+            {
+                var id = primaryIds[i];
+                if (!firstStore.Has(id) || !secondStore.Has(id) || !thirdStore.Has(id) || !_scene.TryGetEntity(id, out var entity))
+                {
+                    continue;
+                }
+
+                ref var first = ref firstStore.Get(id);
+                ref var second = ref secondStore.Get(id);
+                ref var third = ref thirdStore.Get(id);
+                action(ref first, ref second, ref third, entity);
             }
         }
         finally

@@ -7,6 +7,7 @@ public sealed class BuffEffectRegistry
     public BuffEffectRegistry()
     {
         Register(BuffEffectKeys.None, NullBuffEffect.Instance);
+        Register(BuffEffectKeys.AttributeModifier, new AttributeModifierBuffEffect());
     }
 
     public static BuffEffectRegistry CreateDefault()
