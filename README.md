@@ -36,7 +36,7 @@ Unity 不编译（`~` 后缀目录）。
   - `System.Threading.Channels` → `BlockingCollection`；`System.Text.Json` → `Newtonsoft.Json`
   - `Stopwatch.GetElapsedTime` / `Enum.IsDefined<T>` / `PriorityQueue` / `ReferenceEqualityComparer` /
     `IReadOnlySet` / `IsExternalInit` 等缺失 API 以 `Runtime/NKGGameFramework/Compat/` 垫片补齐
-- Unity 侧以 asmdef 组织：`NKGGameFramework`（noEngineReferences）+ `NKGGameFramework.Diagnostics` + `OdinSerializer`
+- Unity 侧以 asmdef 组织：`NKGGameFramework` + `NKGGameFramework.Diagnostics` + `OdinSerializer`（均引用引擎程序集：Odin 的 Unity 分支 API 表面带 UnityEngine 类型，noEngineReferences 开不了）
 - 依赖：UniTask（UPM git 包）、Newtonsoft.Json（`com.unity.nuget.newtonsoft-json`）
 
 上游原 net10 工程（`dotnet build`）不再适用于本仓库布局；Unity 编译即验证。
