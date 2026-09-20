@@ -818,7 +818,7 @@ namespace OdinSerializer
             }
 
 #if !DISABLE_UNITY
-            if (type.InheritsFrom(typeof(UnityEngine.Object))
+            if (type.InheritsFrom(typeof(UnityEngine.Object)))
             {
                 return obj;
             }
