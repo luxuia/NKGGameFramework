@@ -203,11 +203,8 @@ namespace OdinSerializer
                 assemblyName.ProcessorArchitecture = ProcessorArchitecture.MSIL;
                 assemblyName.VersionCompatibility = System.Configuration.Assemblies.AssemblyVersionCompatibility.SameDomain;
 
-#if NET_CORE
+// .NET Standard 2.1（Unity）与 NET_CORE 都没有 AppDomain.DefineDynamicAssembly，统一走 AssemblyBuilder
                 runtimeEmittedAssembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-#else
-                runtimeEmittedAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-#endif
             }
 
             if (runtimeEmittedModule == null)
@@ -224,7 +221,8 @@ namespace OdinSerializer
 #if NET_CORE
                 runtimeEmittedModule = runtimeEmittedAssembly.DefineDynamicModule(RUNTIME_EMITTED_ASSEMBLY_NAME);
 #else
-                runtimeEmittedModule = runtimeEmittedAssembly.DefineDynamicModule(RUNTIME_EMITTED_ASSEMBLY_NAME, emitSymbolInfo);
+                // .NET Standard 2.1 只有单参 DefineDynamicModule（symbol info 不可用）
+                runtimeEmittedModule = runtimeEmittedAssembly.DefineDynamicModule(RUNTIME_EMITTED_ASSEMBLY_NAME);
 #endif
             }
         }
