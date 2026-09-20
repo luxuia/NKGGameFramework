@@ -1,0 +1,107 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using NKGGameFramework.Diagnostics;
+
+namespace NKGGameFramework.Diagnostics
+{
+
+    public sealed record GameDebugDumpDocument(
+        string Format,
+        int Version,
+        string Name,
+        DateTimeOffset CreatedAt,
+        DateTimeOffset StartedAt,
+        DateTimeOffset EndedAt,
+        IReadOnlyList<GameDebugSnapshotMessage> Frames,
+        IReadOnlyList<GameDebugDumpFrameBlocks>? BlockFrames = null,
+        GameDebugDumpRecordingMetrics? Metrics = null);
+
+    public sealed record GameDebugDumpFrameBlocks(
+        int Index,
+        IReadOnlyList<GameDebugDumpWorldBlocks> Worlds);
+
+    public sealed record GameDebugDumpWorldBlocks(
+        string Name,
+        IReadOnlyList<GameDebugDumpSceneBlocks> Scenes);
+
+    public sealed record GameDebugDumpSceneBlocks(
+        string Name,
+        IReadOnlyList<GameDebugDumpComponentStoreBlock> ComponentStores);
+
+    public sealed record GameDebugDumpComponentStoreBlock(
+        DebugTypeInfo Type,
+        int[] EntityIds,
+        string Format,
+        byte[] Payload,
+        string? Error,
+        long Version = 0);
+
+    public sealed record GameDebugDumpRecordingRequest(
+        string Command,
+        string? Name = null,
+        string? DumpDirectory = null);
+
+    public sealed record GameDebugDumpRecordingState(
+        bool IsRecording,
+        DateTimeOffset? StartedAt,
+        int FrameCount,
+        string? LastDumpName,
+        string? LastDumpPath,
+        bool IsFinalizing = false,
+        string? LastDumpError = null,
+        GameDebugDumpRecordingMetrics? Metrics = null);
+
+    public sealed record GameDebugDumpRecordingMetrics(
+        int PublishedFrameCount,
+        int CapturedFrameCount,
+        int PendingCaptureCount,
+        double LastFrameCallbackMilliseconds,
+        double MaxFrameCallbackMilliseconds,
+        double AverageFrameCallbackMilliseconds,
+        double LastCaptureMilliseconds,
+        double MaxCaptureMilliseconds,
+        double AverageCaptureMilliseconds,
+        int LastCapturedStoreCount,
+        int LastCapturedEntityRowCount,
+        int MaxCapturedStoreCount,
+        int MaxCapturedEntityRowCount,
+        long TotalCapturedStoreCount,
+        long TotalCapturedEntityRowCount,
+        long? LastCaptureAllocatedBytes,
+        long? TotalCaptureAllocatedBytes);
+
+    public sealed record GameDebugDumpRecordingResult(
+        bool Succeeded,
+        string Message,
+        GameDebugDumpRecordingState State);
+
+    public sealed record GameDebugDumpPlaybackOpenRequest(
+        string? Path = null);
+
+    public sealed record GameDebugDumpPlaybackManifest(
+        string Id,
+        string Format,
+        int Version,
+        string Name,
+        DateTimeOffset CreatedAt,
+        DateTimeOffset StartedAt,
+        DateTimeOffset EndedAt,
+        IReadOnlyList<GameDebugDumpPlaybackFrame> Frames);
+
+    public sealed record GameDebugDumpPlaybackFrame(
+        int Index,
+        GameDebugFrameInfo Frame);
+
+    public sealed record GameDebugDumpPlaybackComponentRequest(
+        string? PlaybackId,
+        int FrameIndex,
+        string WorldName,
+        string SceneName,
+        int EntityId,
+        string ComponentTypeFullName,
+        string? ComponentAssemblyName = null);
+}

@@ -1,0 +1,19 @@
+{
+    "name": "NKGGameFramework.Diagnostics",
+    "rootNamespace": "NKGGameFramework.Diagnostics",
+    "references": [
+        "NKGGameFramework",
+        "OdinSerializer",
+        "Newtonsoft.Json"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true,
+    "noValidateReferences": false
+}

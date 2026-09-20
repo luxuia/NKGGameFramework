@@ -1,0 +1,11 @@
+{
+  "name": "com.luxuia.nkgframework",
+  "version": "0.1.0",
+  "displayName": "NKG Game Framework",
+  "description": "Pure-C# game framework (Core/ECS/Gameplay/Nodes/Runtime/Async/Serialization/Diagnostics), ported from wqaetly/NKGGameFramework to netstandard2.1/C#9 for Unity 2022.3 (Tuanjie).",
+  "unity": "2022.3",
+  "author": {
+    "name": "luxuia"
+  },
+  "dependencies": {}
+}

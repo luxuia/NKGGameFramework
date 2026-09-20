@@ -1,0 +1,15 @@
+{
+    "name": "OdinSerializer",
+    "rootNamespace": "OdinSerializer",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true,
+    "noValidateReferences": false
+}
